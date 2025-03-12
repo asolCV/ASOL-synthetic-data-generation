@@ -5,3 +5,5 @@
 TODO
 /datasets
 poetry.lock
+/train
+__pycache__

@@ -13,14 +13,21 @@ import numpy as np
 from ultralytics import YOLO
 import torch
 
+from asol_synthetic_data_generation.common.paths import *
+
 # --- Configuration ---
-INPUT_DATA_DIR = Path("roboflow_dataset")  # Directory containing input images
-TRIMMED_DATA_DIR = Path("datasets/trimmed-data")  # Output directory for trimmed images
-YOLO_MODEL_PATH = Path(
-    "weights/yolov8s-seg/best.pt"
-)  # Path to your trained YOLOv8s-seg model
+# Modify INPUT_DATA_DIR to point to the directory containing images to trim
+# and OUTPUT_TRIMMED_IMAGES_DIR to specify the output directory for trimmed images.
+INPUT_DATA_DIR = (
+    DATASETS_DIR / "instance-segmentation"
+)  # Directory containing images to trim
+OUTPUT_TRIMMED_IMAGES_DIR = DATASETS_DIR / "trimmed-images"  # Output directory
+
+# Leave as fixed
 POLE_CLASS_NAME = "Pole"  # Class name for poles in the YOLO model
-MIN_CONFIDENCE = 0.5  # Minimum confidence threshold for YOLO predictions
+
+# Modify these parameters as needed
+MIN_CONFIDENCE = 0.2  # Minimum confidence threshold for YOLO predictions
 MIN_CONTOUR_AREA = 1000  # Minimum contour area to consider
 CENTROID_OFFSET_X = 40  # Horizontal padding around pole centroids
 VERTICAL_PADDING_TOP = 250  # Padding above the pole
@@ -207,10 +214,6 @@ def process_image(image_path: Path, model: YOLO, trimmed_dataset_dir: Path):
         # Get segmentation mask from YOLO model
         mask = get_segmentation_mask(model, image_path)
 
-        # Save mask for debugging (optional)
-        # debug_path = trimmed_dataset_dir / f"{image_path.stem}_mask.png"
-        # cv.imwrite(str(debug_path), mask)
-
         # Find pole contours
         contours = find_pole_contours(mask, MIN_CONTOUR_AREA)
         print(f"Number of pole contours found: {len(contours)}")
@@ -240,11 +243,11 @@ def main():
     print(f"Using device: {device}")
 
     # Create trimmed dataset directory if it doesn't exist
-    trimmed_dataset_dir = TRIMMED_DATA_DIR
+    trimmed_dataset_dir = OUTPUT_TRIMMED_IMAGES_DIR
     trimmed_dataset_dir.mkdir(parents=True, exist_ok=True)
 
     # Load YOLO model
-    model = load_yolo_model(YOLO_MODEL_PATH)
+    model = load_yolo_model(YOLOV8S_SEG_POLE_MODEL_PATH)
 
     # Set model device
     model.to(device)
@@ -265,4 +268,6 @@ def main():
 
 
 if __name__ == "__main__":
+    print("hello")
+    breakpoint()
     main()

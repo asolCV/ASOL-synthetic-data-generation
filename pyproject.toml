@@ -5,20 +5,41 @@ description = ""
 authors = [
     {name = "JacobCrown"}
 ]
-requires-python = "==3.9.2"
+readme="README.md"
+requires-python = ">=3.9,<4.0"
 dependencies = [
-    "opencv-python (>=4.11.0.86,<5.0.0.0)",
     "ultralytics (>=8.3.87,<9.0.0)",
     "roboflow (>=1.1.55,<2.0.0)",
-    "supervision (>=0.25.1,<0.26.0)"
+    "supervision (>=0.22.1,<0.24.0)",
+    "torch (>=2.6.0,<3.0.0)",
+    "torchvision (>=0.21.0,<0.22.0)",
+    "black (>=25.1.0,<26.0.0)",
+    "opencv-python (==4.8.0.76)",
+    "numpy (>1.23,<2.0.0)"
 ]
 
 [tool.poetry]
 
-package-mode = false
+package-mode = true
 
 [tool.poetry.group.dev.dependencies]
 ipykernel = "^6.29.5"
+
+
+[[tool.poetry.source]]
+name = "pytorch-gpu"
+url = "https://download.pytorch.org/whl/cu126"
+priority = "explicit"
+
+
+[tool.poetry.dependencies]
+python = ">=3.9,<4.0"
+ultralytics = ">=8.3.87,<9.0.0"
+roboflow = ">=1.1.55,<2.0.0"
+torch = {source = "pytorch-gpu"}
+torchvision = {source = "pytorch-gpu"}
+black = ">=25.1.0,<26.0.0"
+opencv-python = "==4.8.0.76"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]

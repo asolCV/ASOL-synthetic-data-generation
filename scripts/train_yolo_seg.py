@@ -5,6 +5,7 @@ import supervision as sv
 import matplotlib.pyplot as plt
 import cv2
 
+
 # Konfiguracja Roboflow API
 ROBOFLOW_API_KEY = "cRNpwpG5hUaBUszly98K"  # Wstaw tutaj swój klucz API Roboflow
 ROBOFLOW_WORKSPACE = "asol-mc75w"
