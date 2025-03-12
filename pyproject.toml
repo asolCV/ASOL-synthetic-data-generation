@@ -1,0 +1,25 @@
+[project]
+name = "asol-synthetic-data-generation"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "JacobCrown"}
+]
+requires-python = "==3.9.2"
+dependencies = [
+    "opencv-python (>=4.11.0.86,<5.0.0.0)",
+    "ultralytics (>=8.3.87,<9.0.0)",
+    "roboflow (>=1.1.55,<2.0.0)",
+    "supervision (>=0.25.1,<0.26.0)"
+]
+
+[tool.poetry]
+
+package-mode = false
+
+[tool.poetry.group.dev.dependencies]
+ipykernel = "^6.29.5"
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"

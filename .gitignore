@@ -3,3 +3,5 @@
 /inpainted_images_combined
 /yolo_annotations_combined
 TODO
+/datasets
+poetry.lock
