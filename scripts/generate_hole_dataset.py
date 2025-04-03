@@ -13,7 +13,7 @@ import cv2 as cv
 import numpy as np
 
 # --- Configuration ---
-ROBOFLOW_PROJECT_DIR = Path("asol-keypoint.v2i.coco-segmentation")
+ROBOFLOW_PROJECT_DIR = Path("datasets/keypoints/asol-keypoint.v2i.coco-segmentation")
 IMAGES_DIR = ROBOFLOW_PROJECT_DIR / "train"
 FENCE_MASKS_DIR = ROBOFLOW_PROJECT_DIR / "masks"
 SHAPE_MASKS_DIR = Path("shape_masks")
@@ -161,6 +161,11 @@ def process_images_and_masks(
         return
 
     for img_file in image_files:
+        if (
+            img_file.name
+            != "20241025_111643-mp4_frame_13_0_png.rf.f3b1d913653244e8b54eac36d201a1a6.jpg"
+        ):
+            continue
         try:
             img = load_image(img_file)
             fence_mask = load_mask_grayscale(fence_masks_dir / img_file.name)
