@@ -13,7 +13,7 @@ import numpy as np
 from ultralytics import YOLO
 import torch
 
-from asol_synthetic_data_generation.common.paths import *
+from src.common.paths import *
 
 # --- Configuration ---
 # Modify INPUT_DATA_DIR to point to the directory containing images to trim
@@ -268,6 +268,4 @@ def main():
 
 
 if __name__ == "__main__":
-    print("hello")
-    breakpoint()
     main()

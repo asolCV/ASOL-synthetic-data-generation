@@ -14,8 +14,8 @@ class Config:
     KEYPOINTS_PATH = (
         DATA_ROOT / "keypoints" / "asol-keypoint.v2i.coco-segmentation"
     )  # Example relative path
-    IMAGE_DIR = KEYPOINTS_PATH / "train"  # Example relative path
-    MASK_DIR = KEYPOINTS_PATH / "masks"  # Example relative path
+    IMAGE_DIR = KEYPOINTS_PATH / "test"  # Example relative path
+    MASK_DIR = KEYPOINTS_PATH / "test_masks"  # Example relative path
     OUTPUT_DIR = DATA_ROOT / "output"  # Example relative path
 
     # Model & Training Params
@@ -31,20 +31,20 @@ class Config:
     SEED = 42
 
     # --- Tiling Configuration ---
-    TILE_SIZE = 48  # Size of the square tiles for training
+    TILE_SIZE = 64  # Size of the square tiles for training
     TRAIN_TILE_STRIDE = TILE_SIZE // 2  # Example: 50% overlap
 
     # Training Hyperparameters
     LEARNING_RATE = 1e-4
     WEIGHT_DECAY = 1e-5
-    BATCH_SIZE = 16
-    NUM_EPOCHS = 7
+    BATCH_SIZE = 32
+    NUM_EPOCHS = 50
     CHECKPOINT_FREQ = 5
     VALIDATION_SPLIT = 0.15
 
     # --- Sliding Window Inference/Validation ---
-    INFERENCE_TILE_SIZE = 48
-    INFERENCE_OVERLAP = 24
+    INFERENCE_TILE_SIZE = 64
+    INFERENCE_OVERLAP = 20
 
     # --- Validation Output ---
     SAVE_VALIDATION_PREDS = True

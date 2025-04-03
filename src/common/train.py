@@ -56,7 +56,6 @@ def train_one_epoch(
     Returns:
         The average training loss for the epoch.
     """
-    breakpoint()
     model.train()  # Set model to training mode (enables dropout, batch norm updates)
     loop = tqdm(
         loader, desc=f"Epoch {current_epoch}/{cfg.NUM_EPOCHS} Training", leave=False
@@ -168,7 +167,7 @@ def validate_and_visualize(
                 )
                 # Call the utility function to save the overlay
                 utils.save_validation_prediction(
-                    original_image_tensor=original_image_rgb_tensor,  # Should be [C, H, W] RGB Tensor
+                    original_image_rgb_tensor=original_image_rgb_tensor,  # Should be [C, H, W] Tensor
                     pred_mask_tensor=pred_mask_viz,  # Should be [1, H, W] Tensor
                     gt_mask_tensor=gt_mask.unsqueeze(
                         0

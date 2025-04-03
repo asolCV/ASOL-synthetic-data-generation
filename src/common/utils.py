@@ -1,4 +1,5 @@
 # common/utils.py
+from typing import Any, Dict, List, Union
 import torch
 import matplotlib.pyplot as plt
 import numpy as np
@@ -11,9 +12,27 @@ from src.common.config import cfg
 
 
 # --- Plotting ---
-def plot_metrics(train_losses, val_ious, save_path):
-    """Plots training loss and validation IoU"""
+def plot_metrics(
+    train_losses: List[float],
+    val_metrics: List[float],  # Zmieniono nazwę z val_ious na val_metrics
+    metric_name: str,  # Dodano argument metric_name
+    save_path: Union[str, Path],  # Akceptuje string lub Path
+):
+    """Plots training loss and a specified validation metric."""
     epochs = range(1, len(train_losses) + 1)
+    if not train_losses or not val_metrics:
+        print("Warning: Cannot plot metrics, empty loss or validation metric list.")
+        return
+    if len(train_losses) != len(val_metrics):
+        print(
+            f"Warning: Mismatched lengths for plotting: "
+            f"train_losses ({len(train_losses)}), val_metrics ({len(val_metrics)}). Plotting common range."
+        )
+        min_len = min(len(train_losses), len(val_metrics))
+        epochs = range(1, min_len + 1)
+        train_losses = train_losses[:min_len]
+        val_metrics = val_metrics[:min_len]
+
     plt.figure(figsize=(12, 5))
 
     plt.subplot(1, 2, 1)
@@ -25,17 +44,23 @@ def plot_metrics(train_losses, val_ious, save_path):
     plt.legend()
 
     plt.subplot(1, 2, 2)
-    plt.plot(epochs, val_ious, "r-", label="Validation IoU")
-    plt.title("Validation Mean IoU")
+    # Użycie metric_name w tytule, etykiecie osi Y i legendzie
+    plt.plot(epochs, val_metrics, "r-", label=f"Validation {metric_name}")
+    plt.title(f"Validation {metric_name}")
     plt.xlabel("Epochs")
-    plt.ylabel("IoU")
+    plt.ylabel(metric_name)  # Użycie metric_name jako etykiety osi Y
     plt.grid(True)
     plt.legend()
 
     plt.tight_layout()
-    plt.savefig(Path(save_path))  # Ensure save_path is Path object
-    print(f"Metrics plot saved to {save_path}")
-    plt.close()
+    save_path = Path(save_path)  # Upewnij się, że to obiekt Path
+    try:
+        plt.savefig(save_path)
+        print(f"Metrics plot saved to {save_path}")
+    except Exception as e:
+        print(f"Error saving metrics plot to {save_path}: {e}")
+    finally:
+        plt.close()  # Zamknij figurę, aby zwolnić pamięć, nawet jeśli wystąpi błąd zapisu
 
 
 # --- Saving Predictions ---
@@ -72,10 +97,25 @@ def save_validation_prediction(
 
 
 # --- Checkpointing ---
-def save_checkpoint(state, filename="checkpoint.pth.tar"):
-    filepath = Path(cfg.CHECKPOINT_DIR) / filename  # Use Path object
+def save_checkpoint(
+    state: Dict[str, Any],
+    filename: str = "checkpoint.pth.tar",
+    checkpoint_dir: Union[
+        str, Path
+    ] = cfg.CHECKPOINT_DIR,  # Użyj ścieżki z config jako domyślnej
+):
+    """Saves model and optimizer state."""
+    # Użyj przekazanego checkpoint_dir
+    checkpoint_dir = Path(checkpoint_dir)  # Upewnij się, że to obiekt Path
+    checkpoint_dir.mkdir(
+        parents=True, exist_ok=True
+    )  # Upewnij się, że katalog istnieje
+    filepath = checkpoint_dir / filename
     print(f"=> Saving checkpoint: {filepath}")
-    torch.save(state, filepath)
+    try:
+        torch.save(state, filepath)
+    except Exception as e:
+        print(f"Error saving checkpoint to {filepath}: {e}")
 
 
 def load_checkpoint(checkpoint_path, model, optimizer=None, device=cfg.DEVICE):

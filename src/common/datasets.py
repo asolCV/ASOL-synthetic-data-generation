@@ -211,7 +211,6 @@ class TileTrainingDataset(Dataset):
         if self.transform:
             # Transformacje powinny oczekiwać obrazu jako np.array HWC i maski jako np.array CHW lub HW
             # Dostosuj, jeśli Twoje transformacje oczekują innego formatu wejściowego
-            # breakpoint()
             augmented = self.transform(image=img_tile, mask=mask_tile)
             img_tile = augmented["image"]  # Powinien być już tensorem CHW
             mask_tile = augmented["mask"].unsqueeze(
