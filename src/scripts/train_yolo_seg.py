@@ -1,9 +1,10 @@
 from pathlib import Path
-from roboflow import Roboflow
 from ultralytics import YOLO
 import supervision as sv
 import matplotlib.pyplot as plt
 import cv2
+
+from src.scripts.download_dataset import download_roboflow_dataset
 
 
 # Konfiguracja Roboflow API
@@ -29,24 +30,6 @@ DATASET_PATH.mkdir(parents=True, exist_ok=True)
 MODEL_PATH.mkdir(parents=True, exist_ok=True)
 
 
-def download_roboflow_dataset(
-    api_key, workspace, project, version, format, output_path: Path
-):
-    """Pobiera dataset z Roboflow."""
-    rf = Roboflow(api_key=api_key)
-    workspace_obj = rf.workspace(workspace)
-    project_obj = workspace_obj.project(project)
-    version_obj = project_obj.version(version)
-    dataset = version_obj.download(
-        model_format=format,
-        location=str(
-            output_path / f"{version_obj.name.replace(' ', '-')}-{version_obj.version}"
-        ),
-    )
-    print(f"Dataset Roboflow pobrany do: {output_path}")
-    return Path(dataset.location)
-
-
 def train_yolov8_segmentation(dataset_path: Path, model_output_path: Path):
     """Trenuje model YOLOv8 do segmentacji semantycznej."""
     # Załaduj pre-trenowany model YOLOv8-seg (np. yolov8s-seg.pt)
@@ -60,7 +43,9 @@ def train_yolov8_segmentation(dataset_path: Path, model_output_path: Path):
     # Trenowanie modelu
     print("Rozpoczęcie trenowania modelu YOLOv8 Segmentation...")
     model.train(
-        data=str(data_yaml_path), epochs=50, imgsz=640
+        data=str(data_yaml_path),
+        epochs=50,
+        imgsz=(1920, 1080),  # Dostosuj epoki i rozmiar obrazu, data musi być str
     )  # Dostosuj epoki i rozmiar obrazu, data musi być str
     print("Trenowanie zakończone.")
 

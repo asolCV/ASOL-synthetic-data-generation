@@ -8,7 +8,7 @@ authors = [
 readme = "README.md"
 requires-python = ">=3.9,<4.0"
 packages = [
-    { include = "**/*", from = "asol_synthetic_data_generation" }
+    { include = "*", from = "src" }
 ]
 
 [tool.poetry]
@@ -17,9 +17,14 @@ package-mode = true
 [tool.poetry.dependencies]
 python = ">=3.9,<4.0"
 
+diffusers = { version = "^0.33.1", extras = ["torch"] }
+transformers = "^4.38.0"
+accelerate = "^1.6.0"
+
 # Strict versions for critical packages (GPU-based)
 torch = {source = "pytorch-gpu"}
 torchvision = {source = "pytorch-gpu"}
+numpy = ">=1.21.0,<2.0.0"
 
 # Strict versioning where needed
 opencv-python = "==4.8.0.76"
@@ -31,7 +36,6 @@ supervision = "*"
 black = "*"
 scikit-learn = "*"
 albumentations = "*"
-numpy = "*"
 
 [tool.poetry.group.dev.dependencies]
 ipykernel = "*"

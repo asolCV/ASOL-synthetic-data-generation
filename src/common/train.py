@@ -236,8 +236,8 @@ def main():
             files_scanned += 1
             # Construct the expected corresponding mask path
             expected_mask_path = (
-                cfg.MASK_DIR / img_path.name
-            )  # Assumes mask has the *same name and extension*
+                cfg.MASK_DIR / img_path.with_suffix(".png").name
+            )  # Assumes mask has the *same name and .png extension*
             # Check if the corresponding mask file actually exists
             if expected_mask_path.is_file():
                 image_files.append(img_path)

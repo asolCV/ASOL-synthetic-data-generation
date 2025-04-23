@@ -118,41 +118,91 @@ def save_checkpoint(
         print(f"Error saving checkpoint to {filepath}: {e}")
 
 
+import torch
+from pathlib import Path
+from src.common.config import (
+    cfg,
+)  # Zakładam, że cfg jest tutaj dostępne lub przekazywane inaczej
+
+
 def load_checkpoint(checkpoint_path, model, optimizer=None, device=cfg.DEVICE):
     checkpoint_path = Path(checkpoint_path)  # Ensure Path object
     if not checkpoint_path.exists():
         print(f"Warning: Checkpoint not found at {checkpoint_path}")
-        return 0, 0.0
+        return 0, 0.0  # Zwraca wartości domyślne, jeśli plik nie istnieje
+
     print(f"=> Loading checkpoint: {checkpoint_path}")
-    checkpoint = torch.load(checkpoint_path, map_location=device)
+    try:
+        checkpoint = torch.load(
+            checkpoint_path, map_location=device, weights_only=False
+        )
+        # --- KONIEC ZMIANY ---
 
-    state_dict = checkpoint["state_dict"]
-    new_state_dict = {}
-    is_data_parallel = all(k.startswith("module.") for k in state_dict.keys())
-
-    for k, v in state_dict.items():
-        name = k[7:] if is_data_parallel else k  # remove `module.` prefix if needed
-        new_state_dict[name] = v
-    model.load_state_dict(new_state_dict)
-
-    start_epoch = checkpoint.get("epoch", 0)
-    best_metric = checkpoint.get("best_metric", 0.0)
-
-    if optimizer and "optimizer" in checkpoint:
-        try:
-            optimizer.load_state_dict(checkpoint["optimizer"])
-            print("   Optimizer state loaded.")
-        except ValueError as e:
+        # Sprawdź, czy checkpoint ma oczekiwaną strukturę słownika
+        if not isinstance(checkpoint, dict):
             print(
-                f"   Warning: Could not load optimizer state: {e}. Optimizer reinitialized."
+                f"Error: Checkpoint file at {checkpoint_path} does not contain a dictionary."
             )
-    elif optimizer:
-        print("   Optimizer state not found in checkpoint.")
+            # Można by spróbować załadować bezpośrednio, jeśli to tylko state_dict, ale trzymajmy się struktury
+            # model.load_state_dict(checkpoint)
+            # return 0, 0.0 # Lub zgłosić błąd
+            raise TypeError("Checkpoint file is not a dictionary.")
 
-    print(
-        f"   Loaded model from epoch {start_epoch}. Best recorded metric: {best_metric:.4f}"
-    )
-    return start_epoch, best_metric
+        # Wyodrębnij state_dict - upewnij się, że klucz istnieje
+        if "state_dict" not in checkpoint:
+            print(
+                f"Error: 'state_dict' key not found in checkpoint dictionary at {checkpoint_path}."
+            )
+            # Jeśli nie ma klucza 'state_dict', nie możemy załadować wag modelu
+            raise KeyError("'state_dict' key missing from checkpoint.")
+        state_dict = checkpoint["state_dict"]
+
+        # Obsługa prefixu 'module.' z DataParallel
+        new_state_dict = {}
+        # Sprawdź, czy *wszystkie* klucze zaczynają się od 'module.' - bezpieczniejsze niż sprawdzanie tylko pierwszego
+        is_data_parallel = all(k.startswith("module.") for k in state_dict.keys())
+
+        for k, v in state_dict.items():
+            name = (
+                k[7:] if is_data_parallel and k.startswith("module.") else k
+            )  # Usuń `module.` jeśli istnieje
+            new_state_dict[name] = v
+        model.load_state_dict(new_state_dict)  # Ładuj oczyszczony state_dict
+
+        # Bezpieczne pobieranie metadanych z checkpointu
+        start_epoch = checkpoint.get("epoch", 0)  # Domyślnie 0, jeśli brakuje klucza
+        best_metric = checkpoint.get(
+            "best_metric", 0.0
+        )  # Domyślnie 0.0, jeśli brakuje klucza
+
+        # Ładowanie stanu optymalizatora, jeśli jest wymagany i dostępny
+        if optimizer and "optimizer" in checkpoint:
+            try:
+                optimizer.load_state_dict(checkpoint["optimizer"])
+                print("   Optimizer state loaded.")
+            # Lepiej łapać bardziej ogólny wyjątek lub specyficzne, które mogą wystąpić
+            except Exception as e:
+                print(
+                    f"   Warning: Could not load optimizer state: {e}. Optimizer might be reinitialized or in its initial state."
+                )
+        elif optimizer:
+            print("   Optimizer state not found in checkpoint.")
+
+        print(
+            f"   Loaded model from epoch {start_epoch}. Best recorded metric: {best_metric:.4f}"
+        )
+        return start_epoch, best_metric
+
+    except (
+        FileNotFoundError
+    ):  # Ten catch jest technicznie redundantny przez wcześniejsze sprawdzenie exists(), ale nie szkodzi
+        print(
+            f"Error: Checkpoint file not found at {checkpoint_path} (should have been caught earlier)."
+        )
+        raise  # Zgłoś ponownie
+    except Exception as e:
+        print(f"Error loading checkpoint from {checkpoint_path}: {e}")
+        raise e
 
 
 # --- Metrics ---

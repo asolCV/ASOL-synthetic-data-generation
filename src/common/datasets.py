@@ -202,7 +202,7 @@ class TileTrainingDataset(Dataset):
 
         # 6. Przetwarzanie maski i obrazu
         # Konwersja maski do binarnej float32 (0.0 lub 1.0)
-        mask_tile = (mask_tile > 0).astype(np.float32)
+        mask_tile = (mask_tile > 128).astype(np.float32)
 
         # Konwersja obrazu do RGB (ważne dla transformacji i modelu)
         img_tile = cv2.cvtColor(img_tile, cv2.COLOR_BGR2RGB)

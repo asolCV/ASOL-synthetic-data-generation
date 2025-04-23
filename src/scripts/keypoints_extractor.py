@@ -13,7 +13,7 @@ import numpy as np
 import matplotlib.pyplot as plt  # Keeping for display, consider removing for production
 
 # --- Configuration ---
-ROBOFLOW_PROJECT_DIR = Path("asol-keypoint.v2i.coco-segmentation")
+ROBOFLOW_PROJECT_DIR = Path("roboflow_dataset/asol-keypoint-4")
 ANNOTATION_FILE_PATH = ROBOFLOW_PROJECT_DIR / "train" / "_annotations.coco.json"
 IMAGES_DIR = ROBOFLOW_PROJECT_DIR / "train"
 MASK_OUTPUT_DIR = ROBOFLOW_PROJECT_DIR / "masks"
@@ -21,7 +21,7 @@ VERTICAL_CATEGORY_ID = 1
 HORIZONTAL_CATEGORY_ID = 2
 LINE_THICKNESS = 5
 MASK_COLOR = 255  # White color for lines in the mask (grayscale)
-MASK_SUFFIX = ".jpg"  # Suffix for mask filenames
+MASK_SUFFIX = ".png"  # Suffix for mask filenames
 
 
 def load_annotations(annotation_file: Path) -> dict:
@@ -133,7 +133,7 @@ def process_image_annotations(
         )
         return
 
-    mask = np.zeros((height, width, 1), dtype=np.uint8)
+    mask = np.zeros((height, width), dtype=np.uint8)
     anno_vertical_points = []
     anno_horizontal_points = []
 
@@ -211,7 +211,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-    # Example to display the last generated mask (for debugging/demonstration)
-    # plt.subplots(1, 1)[1].imshow(mask, cmap="gray") # `mask` is not accessible here, needs to be returned from process_image_annotations if you want to display it
-    # plt.show()
