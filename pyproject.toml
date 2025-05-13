@@ -7,12 +7,15 @@ authors = [
 ]
 readme = "README.md"
 requires-python = ">=3.9,<4.0"
-packages = [
-    { include = "*", from = "src" }
-]
-
 [tool.poetry]
 package-mode = true
+packages = [
+    { include = "common", from = "src" },
+    { include = "helpers", from = "src" },
+    { include = "inpainting", from = "src" },
+    { include = "models", from = "src" },
+    { include = "scripts", from = "src" }
+]
 
 [tool.poetry.dependencies]
 python = ">=3.9,<4.0"
@@ -36,6 +39,8 @@ supervision = "*"
 black = "*"
 scikit-learn = "*"
 albumentations = "*"
+protobuf = "^6.30.2"
+sentencepiece = "^0.2.0"
 
 [tool.poetry.group.dev.dependencies]
 ipykernel = "*"
